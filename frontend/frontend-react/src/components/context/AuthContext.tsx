@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useState } from "react";
 
 interface AuthContextType {
     isLoggedIn: boolean;
@@ -8,6 +8,7 @@ interface AuthContextType {
     user: string | null;
     name: string | null;
     token: string | null;
+    checkAuth: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -16,31 +17,42 @@ interface JwtPayload {
     exp: number;
 }
 
+const isTokenValid = (token: string | null): boolean => {
+  if (!token) return false;
+  try {
+    const decoded = jwtDecode<JwtPayload>(token);
+    return decoded.exp * 1000 > Date.now();
+  } catch {
+    return false;
+  }
+};
+
 //export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 //export const AuthProvider = ({children}: {children: React.ReactNode}) => {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     // 기본값으로 false (비로그인 상태)
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
         //return localStorage.getItem("isLoggedIn") === "true";
-        const savedToken = localStorage.getItem("token");
-        if (!savedToken) return false;
-        try {
-            const decoded = jwtDecode<JwtPayload>(savedToken);
-            if (decoded.exp * 1000 < Date.now()) {
-                localStorage.removeItem("token");
-                localStorage.removeItem("user");
-                localStorage.removeItem("name");
-                localStorage.removeItem("isLoggedIn");
-                return false;
-            }
-            return true;
-        } catch {
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-            localStorage.removeItem("name");
-            localStorage.removeItem("isLoggedIn");
-            return false;
-        }
+        // const savedToken = localStorage.getItem("token");
+        // if (!savedToken) return false;
+        // try {
+        //     const decoded = jwtDecode<JwtPayload>(savedToken);
+        //     if (decoded.exp * 1000 < Date.now()) {
+        //         localStorage.removeItem("token");
+        //         localStorage.removeItem("user");
+        //         localStorage.removeItem("name");
+        //         localStorage.removeItem("isLoggedIn");
+        //         return false;
+        //     }
+        //     return true;
+        // } catch {
+        //     localStorage.removeItem("token");
+        //     localStorage.removeItem("user");
+        //     localStorage.removeItem("name");
+        //     localStorage.removeItem("isLoggedIn");
+        //     return false;
+        // }
+        return isTokenValid(localStorage.getItem("token"));
     });
     const [user, setUser] = useState<string | null>(() => {
         return localStorage.getItem("user");
@@ -84,9 +96,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem("user", data.username);
         localStorage.setItem("name", data.name);
         localStorage.setItem("token", data.token);
-    }
+    };
 
-    const logout = () => {
+    const logout = useCallback(() => {
         setIsLoggedIn(false);
         setUser(null);
         setName(null);
@@ -95,24 +107,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem("user");
         localStorage.removeItem("name");
         localStorage.removeItem("token");
-    };
+    },[]);
 
-    useEffect(() => {
-        if (token) {
-            try {
-                const decoded = jwtDecode<JwtPayload>(token);
-                if (decoded.exp * 1000 < Date.now()) {
-                    logout();
+    // useEffect(() => {
+    //     if (token) {
+    //         try {
+    //             const decoded = jwtDecode<JwtPayload>(token);
+    //             if (decoded.exp * 1000 < Date.now()) {
+    //                 logout();
 
-                }
-            } catch {
-                logout();
-            }
+    //             }
+    //         } catch {
+    //             logout();
+    //         }
+    //     }
+    // }, [token]);
+    const checkAuth = useCallback(():boolean =>{
+        const currentToken = localStorage.getItem("token");
+        if(!isTokenValid(currentToken)){
+            logout();
+            return false;
         }
-    }, [token]);
+        return true;
+    },[logout]);
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, login, logout, user, name, token }}>
+        <AuthContext.Provider value={{ isLoggedIn, login, logout, user, name, token, checkAuth }}>
             {children}
         </AuthContext.Provider>
     );
