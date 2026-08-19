@@ -1,13 +1,21 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./components/context/AuthContext";
 import LoginPage from "./components/pages/LoginPage";
 import { MainLayout } from "./components/layout/MainLayout";
 import MainPage from "./components/pages/MainPage";
+import Practice3Page from "./components/pages/Practice3Page";
+import { useEffect } from "react";
 
 
 // 로그인하지 않은 사용자를 /login 으로 튕겨내는 보호용 컴포넌트 (Protected Route)
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, checkAuth } = useAuth();
+  const location = useLocation();
+
+  useEffect(()=>{
+    checkAuth();
+  },[location.pathname, checkAuth]);
+
   if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
   }
@@ -32,6 +40,7 @@ function App() {
           >
             {/* 메인 루트(/)일 때 MainPage 렌더링 */}
             <Route index element={<MainPage />} />
+            <Route path="practice-3" element={<Practice3Page />} />
           </Route>
         </Routes>
       </BrowserRouter>

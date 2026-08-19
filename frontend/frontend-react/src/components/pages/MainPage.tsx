@@ -17,7 +17,7 @@ function MainPage() {
             실습 프로젝트
           </h1>
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            Java/Spring 백엔드를 바탕으로 React, TypeScript, shadcn/ui를 활용한 실습 프로젝트입니다.
+            Java/Spring 백엔드를 바탕으로 React, TypeScript, tailwindcss를 활용한 실습 프로젝트입니다.
           </p>
         </div>
       </div>
@@ -82,7 +82,7 @@ function MainPage() {
       </div>
       {/* 실습 페이지 바로가기 카트 3개 */}
       <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 pt-4">
-        실습 모듈 목록
+        실습 목록
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="hover:shadow-md transition-shadow border-slate-200 dark:border-slate-800">
@@ -116,7 +116,7 @@ function MainPage() {
         <Card className="hover:shadow-md transition-shadow border-slate-200 dark:border-slate-800">
           <CardHeader>
             <CardTitle className="text-lg">3. 백엔드 상태 대시보드</CardTitle>
-            <CardDescription>WebSocket, SEE 실습</CardDescription>
+            <CardDescription>WebSocket, SSE 실습</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
             <Link to="/practice-3">
