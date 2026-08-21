@@ -16,7 +16,7 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(cors -> {})
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/api/dashboard/**", "/ws/**", "/actuator/**").permitAll() // 허용
+                        .pathMatchers("/api/dashboard/**", "/api/agent/**", "/ws/**", "/actuator/**").permitAll() // 허용
                         .anyExchange().authenticated()
                 )
                 .build();

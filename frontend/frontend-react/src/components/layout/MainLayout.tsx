@@ -1,7 +1,7 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Code2, Database, Layers, LayoutDashboard, LogOut, Menu, User } from "lucide-react";
+import { ChevronLeft, ChevronRight, Code2, Database, Layers, LayoutDashboard, LogOut, Menu, User, Bot } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
 
@@ -22,6 +22,7 @@ export function MainLayout() {
     { name: "실습 1: API 게시판", path: "/practice-1", icon: Code2 },
     { name: "실습 2: 인증/권한 테스트", path: "/practice-2", icon: Database },
     { name: "실습 3: 백엔드 상태 대시보드", path: "/practice-3", icon: Layers },
+    { name: "실습 4: AI 에이전트", path: "/practice-4", icon: Bot },
   ];
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col">

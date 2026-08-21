@@ -4,3 +4,7 @@ server:
 spring:
   application:
     name: reactive-service
+
+gemini:
+  api-key: ${GEMINI_API_KEY:YOUR_GEMINI_API_KEY_HERE} # 환경변수 또는 직접 입력
+  model: gemini-2.5-flash-lite

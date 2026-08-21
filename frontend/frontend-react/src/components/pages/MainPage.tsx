@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Code2, Server, ArrowRight, Sparkles } from "lucide-react";
+import { Code2, Server, ArrowRight, Sparkles, Bot } from "lucide-react";
 
 function MainPage() {
   return (
@@ -121,6 +121,24 @@ function MainPage() {
           <CardContent className="pt-0">
             <Link to="/practice-3">
               <Button variant="outline" className="w-full justify-between mt-2">
+                <span>실습 이동</span>
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+         <Card className="hover:shadow-md transition-shadow border-purple-200 dark:border-purple-900/50 bg-gradient-to-b from-purple-50/30 to-transparent dark:from-purple-950/20 flex flex-col justify-between">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-1.5 text-purple-600 dark:text-purple-400 font-semibold text-xs mb-1">
+              <Bot className="h-3.5 w-3.5" />
+              <span>AI Ops Agent</span>
+            </div>
+            <CardTitle className="text-base font-bold">4. AI 에이전트 실습</CardTitle>
+            <CardDescription className="text-xs">Gemini + Tool Function Calling</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <Link to="/practice-4">
+              <Button size="sm" className="w-full justify-between bg-purple-600 hover:bg-purple-700 text-white">
                 <span>실습 이동</span>
                 <ArrowRight className="h-4 w-4" />
               </Button>
