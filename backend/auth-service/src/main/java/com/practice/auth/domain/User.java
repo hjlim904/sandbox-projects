@@ -23,11 +23,16 @@ public class User {
     @Column(nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
     @Builder
-    public User(Long id, String username, String password, String name) {
+    public User(Long id, String username, String password, String name, Role role) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.name = name;
+        this.role = (role != null) ? role : Role.ROLE_USER ;
     }
 }

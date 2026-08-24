@@ -1,5 +1,6 @@
 package com.practice.auth.jwt;
 
+import com.practice.auth.domain.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ public class JwtTokenProviderTest {
     @DisplayName("username을 받아 jwt 토큰 생성")
     void crateTokenSuccess(){
         String username = "test user";
-        String token = jwtTokenProvider.createToken(username);
+        String token = jwtTokenProvider.createToken(username, Role.ROLE_USER);
 
         assertThat(token).isNotNull();
         assertThat(token.split("\\.")).hasSize(3); // JWT는 header.payload.signature로 되어있음
@@ -33,7 +34,7 @@ public class JwtTokenProviderTest {
     @DisplayName("jwt 토큰에서 사용자 이름을 정상적으로 추출")
     void getUsernameFromToken(){
         String username = "test user";
-        String token = jwtTokenProvider.createToken(username);
+        String token = jwtTokenProvider.createToken(username, Role.ROLE_USER);
 
         String extractedUserName = jwtTokenProvider.getUserName(token);
 
@@ -43,7 +44,7 @@ public class JwtTokenProviderTest {
     @Test
     @DisplayName("유효한 토큰이면 ture 반환")
     void validateTokenSuccess(){
-        String token = jwtTokenProvider.createToken("testuser");
+        String token = jwtTokenProvider.createToken("testuser", Role.ROLE_USER);
 
         boolean isValid = jwtTokenProvider.validateToken(token);
 

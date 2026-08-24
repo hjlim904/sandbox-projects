@@ -1,5 +1,6 @@
 package com.practice.auth.service;
 
+import com.practice.auth.domain.Role;
 import com.practice.auth.domain.User;
 import com.practice.auth.dto.LoginRequest;
 import com.practice.auth.dto.LoginResponse;
@@ -28,6 +29,7 @@ public class AuthService {
                 .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
                 .name(request.name())
+                .role(Role.ROLE_USER)
                 .build();
 
         return userRepository.save(user).getId();
@@ -41,7 +43,7 @@ public class AuthService {
             throw  new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        String token = jwtTokenProvider.createToken(user.getUsername());
+        String token = jwtTokenProvider.createToken(user.getUsername(), user.getRole());
         return new LoginResponse(token, user.getUsername(), user.getName());
     }
 

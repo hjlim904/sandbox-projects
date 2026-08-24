@@ -1,5 +1,6 @@
 package com.practice.auth.jwt;
 
+import com.practice.auth.domain.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -16,24 +17,27 @@ public class JwtTokenProvider {
     private final SecretKey key;
     private final long validityInMilliseconds;
     public JwtTokenProvider(
-            @Value("${jwt.secret:v9y$B&E)H@MbQeThWmZq4t7w!z%C*F-JaNdRfUjXn2r5u8x/A?DGVkYp2s5v8y/B}") String secretKey,
+            @Value("${jwt.secret:DijYByK6FnJST8EHfT9GE2Bk/jWpzZ3QjtY6rpZNxV4=}") String secretKey,
             @Value("${jwt.expiration:3600000}") long validityInMilliseconds
     )  {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.validityInMilliseconds = validityInMilliseconds;
     }
 
-    public String createToken(String userName){
+    public String createToken(String userName, Role role) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
-        return Jwts.builder().subject(userName).issuedAt(now).expiration(validity).signWith(key).compact();
+        return Jwts.builder().subject(userName).claim("role", role.name()).issuedAt(now).expiration(validity).signWith(key).compact();
     }
 
     public String getUserName(String token) {
         return parseClaims(token).getSubject();
     }
 
+    public String getRole(String token) {
+        return parseClaims(token).get("role", String.class);
+    }
 
     public boolean validateToken(String token) {
         try{

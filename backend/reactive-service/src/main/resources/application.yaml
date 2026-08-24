@@ -5,6 +5,9 @@ spring:
   application:
     name: reactive-service
 
+jwt:
+  secret: DijYByK6FnJST8EHfT9GE2Bk/jWpzZ3QjtY6rpZNxV4= #연습이니 그냥 적음 원래는 노출되면 안됨
+
 gemini:
   api-key: ${GEMINI_API_KEY:YOUR_GEMINI_API_KEY_HERE} # 환경변수 또는 직접 입력
   model: gemini-2.5-flash-lite

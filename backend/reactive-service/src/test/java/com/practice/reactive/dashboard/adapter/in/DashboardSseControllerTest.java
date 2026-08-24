@@ -32,7 +32,7 @@ class DashboardSseControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("[Red/Green] /api/dashboard/stream/cpu 호출 시 CPU 메트릭 SSE 스트림을 수신한다")
+    @DisplayName("/api/dashboard/stream/cpu 호출 시 CPU 메트릭 SSE 스트림을 수신한다")
     void streamCpu_success() {
         // given
         CpuMetric dummyCpu = CpuMetric.of(20.5, 45.0);
@@ -58,7 +58,7 @@ class DashboardSseControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("[Red/Green] /api/dashboard/stream/memory 호출 시 메모리 메트릭 SSE 스트림을 수신한다")
+    @DisplayName("/api/dashboard/stream/memory 호출 시 메모리 메트릭 SSE 스트림을 수신한다")
     void streamMemory_success() {
         // given
         MemoryMetric dummyMem = MemoryMetric.of(1024L, 2048L);
@@ -84,7 +84,7 @@ class DashboardSseControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("[Red/Green] /api/dashboard/stream/threads 호출 시 스레드 메트릭 SSE 스트림을 수신한다")
+    @DisplayName("/api/dashboard/stream/threads 호출 시 스레드 메트릭 SSE 스트림을 수신한다")
     void streamThreads_success() {
         // given
         ThreadMetric dummyThread = ThreadMetric.of(25, 40, 10L);
