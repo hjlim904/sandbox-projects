@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { Shield, ShieldAlert, ShieldCheck, Globe, User, Terminal, ArrowRight, RefreshCw } from "lucide-react";
+import { Shield, ShieldAlert, ShieldCheck, Globe, User, Terminal, RefreshCw } from "lucide-react";
 
 interface ApiResponse {
   endpoint: string;
@@ -11,7 +11,7 @@ interface ApiResponse {
 }
 
 export default function Practice2Page() {
-  const { user, name, token, logout } = useAuth();
+  const { user, name, token } = useAuth();
   const [logs, setLogs] = useState<ApiResponse[]>([]);
   const [loadingEndpoint, setLoadingEndpoint] = useState<string | null>(null);
 
@@ -216,24 +216,22 @@ export default function Practice2Page() {
             logs.map((log, idx) => (
               <div
                 key={idx}
-                className={`p-3 rounded-lg border ${
-                  log.status === 200
-                    ? "bg-emerald-950/20 border-emerald-800/40 text-emerald-300"
-                    : log.status === 403
+                className={`p-3 rounded-lg border ${log.status === 200
+                  ? "bg-emerald-950/20 border-emerald-800/40 text-emerald-300"
+                  : log.status === 403
                     ? "bg-amber-950/20 border-amber-800/40 text-amber-300"
                     : "bg-rose-950/20 border-rose-800/40 text-rose-300"
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
                     <span
-                      className={`px-2 py-0.5 rounded font-bold text-[11px] ${
-                        log.status === 200
-                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                          : log.status === 403
+                      className={`px-2 py-0.5 rounded font-bold text-[11px] ${log.status === 200
+                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                        : log.status === 403
                           ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
                           : "bg-rose-500/20 text-rose-400 border border-rose-500/30"
-                      }`}
+                        }`}
                     >
                       HTTP {log.status}
                     </span>

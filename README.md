@@ -54,7 +54,7 @@ sandbox-projects/
 | 실습 번호 | 주제 | 백엔드 구현 | 프론트엔드 구현 | 상태 |
 | :--- | :--- | :---: | :---: | :---: |
 | **실습 1** | R2DBC 비동기 API 게시판 (CRUD & 페이징) | 예정 | 예정 | 🎯 대기 중 |
-| **실습 2** | JWT RBAC & Reactive Security 권한 제어 | 예정 | 예정 | 🎯 대기 중 |
+| **실습 2** | JWT RBAC & Reactive Security 권한 제어 | ✅ 완료 | ✅ 완료 | 🟢 완료 |
 | **실습 3** | 실시간 시스템 메트릭 대시보드 (SSE & WebSocket) | ✅ 완료 | ✅ 완료 | 🟢 완료 |
 | **실습 4** | AI Ops 시스템 진단 에이전트 (Gemini Tool Use) | ✅ 완료 (1차) | ✅ 완료 | 🟡 변경 예정 (Spring AI 적용) |
 
