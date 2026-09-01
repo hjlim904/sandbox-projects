@@ -4,6 +4,14 @@ server:
 spring:
   application:
     name: reactive-service
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: ""
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/h2/schema.sql
 
 jwt:
   secret: DijYByK6FnJST8EHfT9GE2Bk/jWpzZ3QjtY6rpZNxV4= #연습이니 그냥 적음 원래는 노출되면 안됨

@@ -46,9 +46,11 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(HttpMethod.OPTIONS).permitAll() // CORS preflight 허용
                         .pathMatchers("/api/dashboard/**", "/api/agent/**", "/ws/**", "/actuator/**", "/api/security/public").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                         .pathMatchers("/api/security/user-only").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
                         .pathMatchers("/api/security/admin-only").hasAuthority("ROLE_ADMIN")
-                        .pathMatchers("/api/security/me").authenticated()
+                        //.pathMatchers("/api/posts/**").authenticated()
+                        //.pathMatchers("/api/security/me").authenticated()
                         .anyExchange().authenticated()
                 )
                 .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
