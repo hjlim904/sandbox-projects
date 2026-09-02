@@ -3,18 +3,7 @@ import { useAgentChat } from "@/hooks/useAgentChat";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Bot,
-  Send,
-  Sparkles,
-  User,
-  Wrench,
-  Trash2,
-  Cpu,
-  Database,
-  Activity,
-  CheckCircle2,
-} from "lucide-react";
+import { Bot, Send, Sparkles, User, Wrench, Trash2, Cpu, Database, Activity, CheckCircle2, FileText,} from "lucide-react";
 
 export default function Practice4Page() {
   const { messages, isStreaming, sendMessage, clearMessages } = useAgentChat();
@@ -40,6 +29,7 @@ export default function Practice4Page() {
   const quickQuestions = [
     { text: "현재 CPU 및 메모리 사용량 상태 알려줘", icon: Cpu },
     { text: "R2DBC DB 및 Auth 서버 헬스 체크해줘", icon: Database },
+    { text: "최근 등록된 게시판 글 목록을 확인하고 요약해줘", icon: FileText },
     { text: "백엔드 전반적인 시스템 이상 여부 진단해줘", icon: Activity },
   ];
 
