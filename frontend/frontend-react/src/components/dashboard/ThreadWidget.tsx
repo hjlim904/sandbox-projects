@@ -1,12 +1,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { type ThreadDataPoint, useSseMetric } from "@/hooks/useSseMetric";
 import { GitCommit, Layers } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ThreadWidgetProps {
   enabled: boolean;
 }
 
 export function ThreadWidget({ enabled }: ThreadWidgetProps) {
+  const { t } = useTranslation();
   const { latestData, isConnected } = useSseMetric<ThreadDataPoint>("threads", enabled);
 
   return (
@@ -18,7 +20,7 @@ export function ThreadWidget({ enabled }: ThreadWidgetProps) {
               <Layers className="h-5 w-5" />
             </div>
             <div>
-              <CardTitle className="text-base font-bold">JVM 스레드 현황</CardTitle>
+              <CardTitle className="text-base font-bold">{t("practice3.threads")}</CardTitle>
               <CardDescription className="text-xs">Server-Sent Events (SSE)</CardDescription>
             </div>
           </div>

@@ -4,10 +4,14 @@ import { useState } from "react";
 import { ChevronLeft, ChevronRight, Code2, Database, Layers, LayoutDashboard, LogOut, Menu, User, Bot } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
+import { useTranslation } from "react-i18next";
+import { LanguageToggle } from "../ui/LanguageToggle";
 
 export function MainLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
   // 데스크톱 사이드바 접힘/열림 상태
   const [isCollapsed, setIsCollapsed] = useState(false);
   // 모바일 사이드바 열림/닫힘 상태
@@ -18,11 +22,11 @@ export function MainLayout() {
   };
   // 사이드바에 들어갈 3개의 실습 메뉴 항목들
   const navItems = [
-    { name: "메인 소개", path: "/", icon: LayoutDashboard },
-    { name: "실습 1: API 게시판", path: "/practice-1", icon: Code2 },
-    { name: "실습 2: 인증/권한 테스트", path: "/practice-2", icon: Database },
-    { name: "실습 3: 백엔드 상태 대시보드", path: "/practice-3", icon: Layers },
-    { name: "실습 4: AI 에이전트", path: "/practice-4", icon: Bot },
+    { name: t("nav.main"), path: "/", icon: LayoutDashboard },
+    { name: t("nav.practice1"), path: "/practice-1", icon: Code2 },
+    { name: t("nav.practice2"), path: "/practice-2", icon: Database },
+    { name: t("nav.practice3"), path: "/practice-3", icon: Layers },
+    { name: t("nav.practice4"), path: "/practice-4", icon: Bot },
   ];
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col">
@@ -56,20 +60,21 @@ export function MainLayout() {
             </SheetContent>
           </Sheet>
           <span className="font-bold text-xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            Java Dev Portfolio
+            {t("header.title")}
           </span>
         </div>
         {/* 오른쪽 사용자 프로필 & 로그아웃 */}
         <div className="flex items-center gap-4">
+          <LanguageToggle />
           <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
             <div className="p-1.5 bg-slate-100 dark:bg-slate-800 rounded-full">
               <User className="h-4 w-4" />
             </div>
-            <span>{user || "사용자"}님</span>
+            <span>{t("header.userGreeting", { name: user || "User" })}</span>
           </div>
           <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2">
             <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">로그아웃</span>
+            <span className="hidden sm:inline">{t("header.logout")}</span>
           </Button>
         </div>
       </header>

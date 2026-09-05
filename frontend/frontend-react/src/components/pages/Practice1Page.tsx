@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import {FileText, Plus, MessageSquare, Trash2, Edit3, Calendar, User, ChevronLeft, ChevronRight, Send, X, RefreshCw, Clock} from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface Post {
   id: number;
@@ -33,6 +34,7 @@ interface PageResponse<T> {
 }
 
 export default function Practice1Page() {
+  const { t } = useTranslation();
   const { user, token } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [page, setPage] = useState<number>(0);
@@ -62,7 +64,7 @@ export default function Practice1Page() {
         setTotalCount(data.totalCount);
       }
     } catch (err) {
-      console.error("게시글 목록 불러오기 실패:", err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -82,7 +84,7 @@ export default function Practice1Page() {
         setSelectedPostDetail(data);
       }
     } catch (err) {
-      console.error("게시글 상세 조회 실패:", err);
+      console.error(err);
     } finally {
       setIsDetailLoading(false);
     }
@@ -91,7 +93,10 @@ export default function Practice1Page() {
   // 게시글 작성 또는 수정
   const handleSavePost = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formTitle.trim() || !formContent.trim() || !token) return;
+    if (!formTitle.trim() || !formContent.trim()) {
+      alert(t("practice1.modal.alertFillAll"));
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -107,7 +112,11 @@ export default function Practice1Page() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ title: formTitle, content: formContent }),
+        body: JSON.stringify({ 
+          title: formTitle, 
+          content: formContent,
+          author: user || "Anonymous" 
+        }),
       });
 
       if (res.ok) {
@@ -120,11 +129,10 @@ export default function Practice1Page() {
           openDetailModal(selectedPostDetail.post.id);
         }
       } else {
-        const err = await res.text();
-        alert(`저장 실패: ${err}`);
+        alert(t("common.error"));
       }
     } catch (err) {
-      alert("네트워크 오류가 발생했습니다.");
+      alert(t("common.error"));
     } finally {
       setIsSubmitting(false);
     }
@@ -132,7 +140,7 @@ export default function Practice1Page() {
 
   // 게시글 삭제
   const handleDeletePost = async (postId: number) => {
-    if (!confirm("정말 이 게시글을 삭제하시겠습니까?") || !token) return;
+    if (!window.confirm(t("practice1.detail.deleteConfirm"))) return;
 
     try {
       const res = await fetch(`http://localhost:8082/api/posts/${postId}`, {
@@ -146,10 +154,10 @@ export default function Practice1Page() {
         }
         fetchPosts(page);
       } else {
-        alert("삭제 권한이 없거나 실패했습니다.");
+        alert(t("common.error"));
       }
     } catch (err) {
-      alert("삭제 중 오류가 발생했습니다.");
+      alert(t("common.error"));
     }
   };
 
@@ -167,7 +175,10 @@ export default function Practice1Page() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ content: commentInput }),
+          body: JSON.stringify({ 
+            content: commentInput,
+            author: user || "Anonymous"
+          }),
         }
       );
 
@@ -175,16 +186,16 @@ export default function Practice1Page() {
         setCommentInput("");
         openDetailModal(selectedPostDetail.post.id);
       } else {
-        alert("댓글 작성 실패");
+        alert(t("common.error"));
       }
     } catch (err) {
-      alert("댓글 작성 중 오류 발생");
+      alert(t("common.error"));
     }
   };
 
   // 댓글 삭제
   const handleDeleteComment = async (commentId: number) => {
-    if (!selectedPostDetail || !token || !confirm("댓글을 삭제하시겠습니까?")) return;
+    if (!selectedPostDetail || !token || !window.confirm(t("practice1.detail.deleteConfirm"))) return;
 
     try {
       const res = await fetch(
@@ -199,7 +210,7 @@ export default function Practice1Page() {
         openDetailModal(selectedPostDetail.post.id);
       }
     } catch (err) {
-      alert("댓글 삭제 중 오류 발생");
+      alert(t("common.error"));
     }
   };
 
@@ -225,12 +236,12 @@ export default function Practice1Page() {
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
-              실습 1
+              {t("practice1.badge")}
             </span>
-            <h1 className="text-xl font-bold text-slate-100">R2DBC 비동기 게시판 & 댓글 시스템</h1>
+            <h1 className="text-xl font-bold text-slate-100">{t("practice1.title")}</h1>
           </div>
           <p className="text-sm text-slate-400 mt-1">
-            Spring Data R2DBC + WebFlux 기반 완전 비동기 논블로킹 CRUD 및 1:N 실시간 댓글 처리
+            {t("practice1.desc")}
           </p>
         </div>
 
@@ -238,7 +249,7 @@ export default function Practice1Page() {
           <button
             onClick={() => fetchPosts(page)}
             className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition cursor-pointer"
-            title="새로고침"
+            title={t("common.refresh")}
           >
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </button>
@@ -247,7 +258,7 @@ export default function Practice1Page() {
             className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold shadow-lg shadow-blue-500/20 transition cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            새 글 작성
+            {t("practice1.newPost")}
           </button>
         </div>
       </div>
@@ -256,7 +267,7 @@ export default function Practice1Page() {
       <div className="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
         <div className="p-4 border-b border-slate-800/80 flex items-center justify-between">
           <span className="text-xs font-semibold text-slate-400">
-            총 <span className="text-blue-400 font-bold">{totalCount}</span>개의 게시글
+            {t("practice1.pageInfo", { total: totalCount, current: page + 1, totalPages: Math.max(1, totalPages) })}
           </span>
           <span className="text-xs text-slate-500 font-mono">Page {page + 1} of {Math.max(1, totalPages)}</span>
         </div>
@@ -264,12 +275,12 @@ export default function Practice1Page() {
         {loading && posts.length === 0 ? (
           <div className="p-12 text-center text-slate-500 text-sm">
             <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-blue-400" />
-            게시글을 불러오는 중...
+            {t("common.loading")}
           </div>
         ) : posts.length === 0 ? (
           <div className="p-12 text-center text-slate-500 text-sm">
             <FileText className="w-8 h-8 mx-auto mb-2 text-slate-600" />
-            등록된 게시글이 없습니다. 첫 번째 글을 작성해보세요!
+            {t("practice1.table.noPosts")}
           </div>
         ) : (
           <div className="divide-y divide-slate-800/60">
@@ -310,7 +321,7 @@ export default function Practice1Page() {
                         <button
                           onClick={() => openWriteModal(post)}
                           className="p-1.5 text-slate-400 hover:text-blue-400 hover:bg-slate-800 rounded-lg transition"
-                          title="수정"
+                          title={t("common.edit")}
                         >
                           <Edit3 className="w-4 h-4" />
                         </button>
@@ -318,12 +329,19 @@ export default function Practice1Page() {
                       <button
                         onClick={() => handleDeletePost(post.id)}
                         className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition"
-                        title="삭제"
+                        title={t("common.delete")}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </>
                   )}
+                  <button
+                    onClick={() => openDetailModal(post.id)}
+                    className="flex items-center gap-1 text-xs text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 px-2.5 py-1.5 rounded-lg border border-blue-500/20 transition cursor-pointer ml-2"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span>{t("practice1.table.comments")}</span>
+                  </button>
                 </div>
               </div>
             ))}
@@ -338,7 +356,7 @@ export default function Practice1Page() {
             className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:pointer-events-none rounded-lg border border-slate-700 transition cursor-pointer"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
-            이전
+            Prev
           </button>
           <span className="text-xs text-slate-400">
             {totalPages === 0 ? "1 / 1" : `${page + 1} / ${totalPages}`}
@@ -348,19 +366,19 @@ export default function Practice1Page() {
             disabled={page + 1 >= totalPages || loading}
             className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:pointer-events-none rounded-lg border border-slate-700 transition cursor-pointer"
           >
-            다음
+            Next
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      {/* 4. 글 작성 / 수정 */}
+      {/* 4. 게시글 작성/수정 모달 */}
       {isWriteModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div className="p-6 border-b border-slate-800 flex items-center justify-between">
               <h3 className="font-bold text-slate-100">
-                {editingPost ? "게시글 수정" : "새 게시글 작성"}
+                {editingPost ? t("practice1.modal.editTitle") : t("practice1.modal.writeTitle")}
               </h3>
               <button
                 onClick={() => setIsWriteModalOpen(false)}
@@ -372,27 +390,27 @@ export default function Practice1Page() {
             <form onSubmit={handleSavePost} className="p-6 space-y-4">
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                  제목
+                  {t("practice1.modal.titleLabel")}
                 </label>
                 <input
                   type="text"
                   required
                   value={formTitle}
                   onChange={(e) => setFormTitle(e.target.value)}
-                  placeholder="제목을 입력하세요"
+                  placeholder={t("practice1.modal.titlePlaceholder")}
                   className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 text-sm focus:outline-none focus:border-blue-500"
                 />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                  내용
+                  {t("practice1.modal.contentLabel")}
                 </label>
                 <textarea
                   required
                   rows={6}
                   value={formContent}
                   onChange={(e) => setFormContent(e.target.value)}
-                  placeholder="내용을 입력하세요"
+                  placeholder={t("practice1.modal.contentPlaceholder")}
                   className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 text-sm focus:outline-none focus:border-blue-500 resize-none"
                 />
               </div>
@@ -402,14 +420,18 @@ export default function Practice1Page() {
                   onClick={() => setIsWriteModalOpen(false)}
                   className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-slate-200"
                 >
-                  취소
+                  {t("common.cancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-lg shadow-blue-500/20 transition cursor-pointer"
                 >
-                  {isSubmitting ? "저장 중..." : editingPost ? "수정 완료" : "작성 완료"}
+                  {isSubmitting
+                    ? t("practice1.modal.submitting")
+                    : editingPost
+                    ? t("practice1.modal.updateBtn")
+                    : t("practice1.modal.createBtn")}
                 </button>
               </div>
             </form>
@@ -462,14 +484,14 @@ export default function Practice1Page() {
               <div className="space-y-3 pt-2">
                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-300">
                   <MessageSquare className="w-4 h-4 text-blue-400" />
-                  댓글 <span className="text-blue-400">({selectedPostDetail.comments.length})</span>
+                  {t("practice1.detail.commentsTitle")} <span className="text-blue-400">({selectedPostDetail.comments.length})</span>
                 </div>
 
                 {/* 댓글 목록 */}
                 <div className="space-y-2">
                   {selectedPostDetail.comments.length === 0 ? (
                     <div className="text-center py-4 text-xs text-slate-500">
-                      아직 작성된 댓글이 없습니다.
+                      {t("practice1.detail.noComments")}
                     </div>
                   ) : (
                     selectedPostDetail.comments.map((comment) => (
@@ -492,7 +514,7 @@ export default function Practice1Page() {
                           <button
                             onClick={() => handleDeleteComment(comment.id)}
                             className="text-slate-500 hover:text-rose-400 transition"
-                            title="댓글 삭제"
+                            title={t("common.delete")}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -508,7 +530,7 @@ export default function Practice1Page() {
                     type="text"
                     value={commentInput}
                     onChange={(e) => setCommentInput(e.target.value)}
-                    placeholder="따뜻한 댓글을 남겨보세요..."
+                    placeholder={t("practice1.detail.commentPlaceholder")}
                     className="flex-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-blue-500"
                   />
                   <button
@@ -517,7 +539,7 @@ export default function Practice1Page() {
                     className="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white rounded-xl text-xs font-medium flex items-center gap-1 transition cursor-pointer"
                   >
                     <Send className="w-3 h-3" />
-                    등록
+                    {t("practice1.detail.commentSubmit")}
                   </button>
                 </form>
               </div>

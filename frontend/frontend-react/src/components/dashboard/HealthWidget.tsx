@@ -2,12 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useWebSocketHealth } from "@/hooks/useWebSocketHealth";
 import { CheckCircle2, Database, Network, Radio, Send, Terminal, XCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface HealthWidgetProps {
   enabled: boolean;
 }
 
 export function HealthWidget({ enabled }: HealthWidgetProps) {
+  const { t } = useTranslation();
   const { components, logs, isConnected, sendMessage } = useWebSocketHealth(enabled);
 
   const r2dbc = components["R2DBC-H2"];
@@ -22,7 +24,7 @@ export function HealthWidget({ enabled }: HealthWidgetProps) {
               <Network className="h-5 w-5" />
             </div>
             <div>
-              <CardTitle className="text-base font-bold">컴포넌트 헬스 & WebSocket 진단</CardTitle>
+              <CardTitle className="text-base font-bold">{t("practice3.health")}</CardTitle>
               <CardDescription className="text-xs">양방향 인터랙티브 WebSocket (/ws/dashboard/health)</CardDescription>
             </div>
           </div>

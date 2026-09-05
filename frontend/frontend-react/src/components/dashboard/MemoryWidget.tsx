@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { type MemoryDataPoint, useSseMetric } from "@/hooks/useSseMetric";
 import { HardDrive } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   Area,
   AreaChart,
@@ -16,6 +17,7 @@ interface MemoryWidgetProps {
 }
 
 export function MemoryWidget({ enabled }: MemoryWidgetProps) {
+  const { t } = useTranslation();
   const { dataHistory, latestData, isConnected } = useSseMetric<MemoryDataPoint>("memory", enabled);
 
   return (
@@ -27,7 +29,7 @@ export function MemoryWidget({ enabled }: MemoryWidgetProps) {
               <HardDrive className="h-5 w-5" />
             </div>
             <div>
-              <CardTitle className="text-base font-bold">JVM 힙 메모리</CardTitle>
+              <CardTitle className="text-base font-bold">{t("practice3.memory")}</CardTitle>
               <CardDescription className="text-xs">Server-Sent Events (SSE)</CardDescription>
             </div>
           </div>

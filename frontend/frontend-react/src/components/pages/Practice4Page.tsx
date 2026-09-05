@@ -3,9 +3,11 @@ import { useAgentChat } from "@/hooks/useAgentChat";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Bot, Send, Sparkles, User, Wrench, Trash2, Cpu, Database, Activity, CheckCircle2, FileText,} from "lucide-react";
+import { Bot, Send, Sparkles, User, Wrench, Trash2, Cpu, Database, Activity, CheckCircle2, FileText } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Practice4Page() {
+  const { t } = useTranslation();
   const { messages, isStreaming, sendMessage, clearMessages } = useAgentChat();
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -25,12 +27,12 @@ export default function Practice4Page() {
     setInput("");
   };
 
-  // 빠른 질문 프리셋 버튼들
+  // 빠른 질문 프리셋 버튼들 (i18n 적용)
   const quickQuestions = [
-    { text: "현재 CPU 및 메모리 사용량 상태 알려줘", icon: Cpu },
-    { text: "R2DBC DB 및 Auth 서버 헬스 체크해줘", icon: Database },
-    { text: "최근 등록된 게시판 글 목록을 확인하고 요약해줘", icon: FileText },
-    { text: "백엔드 전반적인 시스템 이상 여부 진단해줘", icon: Activity },
+    { text: t("practice4.q1"), icon: Cpu },
+    { text: t("practice4.q2"), icon: Database },
+    { text: t("practice4.q3"), icon: FileText },
+    { text: t("practice4.q4"), icon: Activity },
   ];
 
   return (
@@ -40,13 +42,13 @@ export default function Practice4Page() {
         <div className="space-y-1">
           <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-purple-500/20 text-purple-300 rounded-full text-xs font-semibold border border-purple-500/30">
             <Sparkles className="h-3.5 w-3.5" />
-            <span>Google Gemini + Function Calling</span>
+            <span>{t("practice4.badge")}</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
-            AI 시스템 진단 에이전트
+            {t("practice4.title")}
           </h1>
           <p className="text-slate-300 text-xs sm:text-sm">
-            Spring WebFlux의 도구(Tool)를 직접 실행하여 백엔드 리소스를 실시간 진단합니다.
+            {t("practice4.desc")}
           </p>
         </div>
         <Button
@@ -56,7 +58,7 @@ export default function Practice4Page() {
           className="text-xs gap-1 text-slate-300 border-slate-700 hover:bg-slate-800"
         >
           <Trash2 className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">대화 비우기</span>
+          <span className="hidden sm:inline">{t("practice4.clearChat")}</span>
         </Button>
       </div>
 
@@ -82,7 +84,7 @@ export default function Practice4Page() {
                 {msg.toolCall && (
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 rounded-lg text-xs font-mono animate-in fade-in">
                     <Wrench className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 animate-spin" />
-                    <span>[Tool Executed] <strong>{msg.toolCall.name}</strong></span>
+                    <span>[{t("practice4.toolExecuting")}] <strong>{msg.toolCall.name}</strong></span>
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 ml-1" />
                   </div>
                 )}
@@ -98,7 +100,7 @@ export default function Practice4Page() {
                   {msg.isThinking && !msg.content ? (
                     <div className="flex items-center gap-2 text-slate-500 text-xs py-1">
                       <span className="h-2 w-2 rounded-full bg-purple-500 animate-ping" />
-                      <span>에이전트가 질문을 분석하고 적절한 도구를 찾는 중입니다...</span>
+                      <span>{t("practice4.thinking")}</span>
                     </div>
                   ) : (
                     msg.content
@@ -143,7 +145,7 @@ export default function Practice4Page() {
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="시스템 상태나 질문을 입력하세요... (예: '현재 서버 리소스 괜찮아?')"
+              placeholder={t("practice4.placeholder")}
               disabled={isStreaming}
               className="text-sm bg-white dark:bg-slate-950"
             />
@@ -153,7 +155,7 @@ export default function Practice4Page() {
               className="bg-purple-600 hover:bg-purple-700 text-white gap-1.5 px-4 shrink-0"
             >
               <Send className="h-4 w-4" />
-              <span>전송</span>
+              <span>{t("practice4.send")}</span>
             </Button>
           </form>
         </div>

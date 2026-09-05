@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { type CpuDataPoint, useSseMetric } from "@/hooks/useSseMetric";
 import { Activity, Cpu } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   Area,
   AreaChart,
@@ -16,6 +17,7 @@ interface CpuWidgetProps {
 }
 
 export function CpuWidget({ enabled }: CpuWidgetProps) {
+  const { t } = useTranslation();
   const { dataHistory, latestData, isConnected } = useSseMetric<CpuDataPoint>("cpu", enabled);
 
   return (
@@ -27,7 +29,7 @@ export function CpuWidget({ enabled }: CpuWidgetProps) {
               <Cpu className="h-5 w-5" />
             </div>
             <div>
-              <CardTitle className="text-base font-bold">CPU 사용률</CardTitle>
+              <CardTitle className="text-base font-bold">{t("practice3.cpu")}</CardTitle>
               <CardDescription className="text-xs">Server-Sent Events (SSE)</CardDescription>
             </div>
           </div>

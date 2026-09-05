@@ -5,8 +5,10 @@ import { ThreadWidget } from "../dashboard/ThreadWidget";
 import { HealthWidget } from "../dashboard/HealthWidget";
 import { Activity, Check, Cpu, HardDrive, Layers, Network, RefreshCw, Sparkles } from "lucide-react";
 import { Button } from "../ui/button";
+import { useTranslation } from "react-i18next";
 
 export default function Practice3Page() {
+  const { t } = useTranslation();
   // 사용자가 보고 싶은 위젯만 개별 선택(구독)할 수 있는 토글 상태
   const [selectedWidgets, setSelectedWidgets] = useState({
     cpu: true,
@@ -37,14 +39,13 @@ export default function Practice3Page() {
         <div className="relative z-10 space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-xs font-semibold border border-indigo-500/30">
             <Sparkles className="h-3.5 w-3.5" />
-            <span>Spring WebFlux & Reactive Stream</span>
+            <span>{t("practice3.badge")}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            실시간 백엔드 상태 모니터링 대시보드
+            {t("practice3.title")}
           </h1>
           <p className="text-slate-300 text-xs sm:text-sm max-w-3xl leading-relaxed">
-            Spring WebFlux의 <strong>Server-Sent Events (SSE)</strong>와 <strong>WebSocket</strong>을 하이브리드로 활용한 실시간 지표 모니터링 화면입니다. 
-            원하는 위젯을 개별적으로 선택하여 리소스를 최적화하고 실시간 스트림을 구독할 수 있습니다.
+            {t("practice3.desc")}
           </p>
         </div>
       </div>
@@ -53,7 +54,7 @@ export default function Practice3Page() {
       <div className="bg-white dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
           <Activity className="h-4 w-4 text-indigo-500" />
-          <span>모니터링 위젯 선택:</span>
+          <span>{t("practice3.widgetSelect")}</span>
         </div>
 
         {/* 토글 칩 4개 */}
@@ -68,7 +69,7 @@ export default function Practice3Page() {
             }`}
           >
             <Cpu className="h-3.5 w-3.5" />
-            <span>CPU 사용률</span>
+            <span>{t("practice3.cpu")}</span>
             {selectedWidgets.cpu && <Check className="h-3.5 w-3.5 ml-0.5" />}
           </button>
 
@@ -82,7 +83,7 @@ export default function Practice3Page() {
             }`}
           >
             <HardDrive className="h-3.5 w-3.5" />
-            <span>JVM 메모리</span>
+            <span>{t("practice3.memory")}</span>
             {selectedWidgets.memory && <Check className="h-3.5 w-3.5 ml-0.5" />}
           </button>
 
@@ -96,7 +97,7 @@ export default function Practice3Page() {
             }`}
           >
             <Layers className="h-3.5 w-3.5" />
-            <span>스레드 현황</span>
+            <span>{t("practice3.threads")}</span>
             {selectedWidgets.threads && <Check className="h-3.5 w-3.5 ml-0.5" />}
           </button>
 
@@ -110,7 +111,7 @@ export default function Practice3Page() {
             }`}
           >
             <Network className="h-3.5 w-3.5" />
-            <span>컴포넌트 헬스 (WS)</span>
+            <span>{t("practice3.health")}</span>
             {selectedWidgets.health && <Check className="h-3.5 w-3.5 ml-0.5" />}
           </button>
         </div>
@@ -118,10 +119,10 @@ export default function Practice3Page() {
         {/* 전체 선택 / 해제 */}
         <div className="flex items-center gap-1.5">
           <Button variant="ghost" size="sm" onClick={enableAll} className="text-xs h-8 px-2.5">
-            <RefreshCw className="h-3 w-3 mr-1" /> 전체 켜기
+            <RefreshCw className="h-3 w-3 mr-1" /> {t("practice3.allOn")}
           </Button>
           <Button variant="ghost" size="sm" onClick={disableAll} className="text-xs h-8 px-2.5 text-slate-500">
-            전체 끄기
+            {t("practice3.allOff")}
           </Button>
         </div>
       </div>
