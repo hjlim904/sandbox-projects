@@ -22,3 +22,11 @@ jwt:
   secret: DijYByK6FnJST8EHfT9GE2Bk/jWpzZ3QjtY6rpZNxV4= #연습이니 그냥 적음 원래는 노출되면 안됨
   access-expiration: 600000
   refresh-expiration: 3600000
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+    prefer-ip-address: true

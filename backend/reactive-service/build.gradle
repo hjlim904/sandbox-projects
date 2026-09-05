@@ -21,6 +21,13 @@ repositories {
 
 ext {
 	set('springAiVersion', "2.0.1") // Spring AI 최신 버전
+	set('springCloudVersion', "2025.1.3")
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
 
 dependencies {
@@ -53,6 +60,9 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+	// Eureka Client
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
 	// Tests
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -23,3 +23,11 @@ gemini:
   api-key: ${GEMINI_API_KEY:YOUR_GEMINI_API_KEY_HERE} # 환경변수 또는 직접 입력
   model: gemini-3.7-flash # Gemini 3.7 Flash
   thinking-budget: 1024 # Low (1024 tokens)
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+    prefer-ip-address: true
