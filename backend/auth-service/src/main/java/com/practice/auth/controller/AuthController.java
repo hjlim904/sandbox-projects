@@ -1,8 +1,6 @@
 package com.practice.auth.controller;
 
-import com.practice.auth.dto.LoginRequest;
-import com.practice.auth.dto.LoginResponse;
-import com.practice.auth.dto.SignUpRequest;
+import com.practice.auth.dto.*;
 import com.practice.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,14 +16,17 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<Long> signup(@RequestBody SignUpRequest request){
-        Long id = authService.signup(request);
-        return ResponseEntity.ok(id);
+    public ResponseEntity<SignupResponse> signup(@RequestBody SignUpRequest request){
+        return ResponseEntity.ok(authService.signup(request));
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> longin(@RequestBody LoginRequest request){
-        LoginResponse response = authService.login(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenRefreshResponse> refresh(@RequestBody RefreshRequest request) {
+        return ResponseEntity.ok(authService.refreshToken(request.refreshToken()));
     }
 }

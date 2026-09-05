@@ -8,7 +8,8 @@ interface AuthContextType {
     user: string | null;
     name: string | null;
     token: string | null;
-    checkAuth: () => boolean;
+    refreshToken: string | null;
+    checkAuth: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,6 +27,8 @@ const isTokenValid = (token: string | null): boolean => {
     return false;
   }
 };
+
+let ongoingRefreshPromise: Promise<boolean> | null = null;
 
 //export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 //export const AuthProvider = ({children}: {children: React.ReactNode}) => {
@@ -54,6 +57,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // }
         return isTokenValid(localStorage.getItem("token"));
     });
+    const [refreshToken, setRefreshToken] = useState<string | null>(() => {
+        return localStorage.getItem("refreshToken")
+    });
     const [user, setUser] = useState<string | null>(() => {
         return localStorage.getItem("user");
     });
@@ -71,6 +77,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     //     localStorage.setItem("user", username);
     // };
 
+    const logout = useCallback(() => {
+        setIsLoggedIn(false);
+        setUser(null);
+        setName(null);
+        setToken(null);
+        setRefreshToken(null);
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("user");
+        localStorage.removeItem("name");
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+    },[]);
+
     const login = async (username: string, password: string) => {
         const response = await fetch("http://localhost:8081/api/auth/login", {
             method: "POST",
@@ -85,29 +104,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             throw new Error(errorText || "로그인 실패");
         }
 
-        const data: { token: string; username: string; name: string } = await response.json();
+        const data: { accessToken: string; refreshToken: string; username: string; name: string; role: string } = await response.json();
 
         setIsLoggedIn(true);
         setUser(data.username);
         setName(data.name);
-        setToken(data.token);
+        setToken(data.accessToken);
+        setRefreshToken(data.refreshToken);
 
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("user", data.username);
         localStorage.setItem("name", data.name);
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("token", data.accessToken);
+        localStorage.setItem("refreshToken", data.refreshToken);
     };
-
-    const logout = useCallback(() => {
-        setIsLoggedIn(false);
-        setUser(null);
-        setName(null);
-        setToken(null);
-        localStorage.removeItem("isLoggedIn");
-        localStorage.removeItem("user");
-        localStorage.removeItem("name");
-        localStorage.removeItem("token");
-    },[]);
 
     // useEffect(() => {
     //     if (token) {
@@ -122,17 +132,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     //         }
     //     }
     // }, [token]);
-    const checkAuth = useCallback(():boolean =>{
+
+    // const checkAuth = useCallback(():boolean =>{
+    //     const currentToken = localStorage.getItem("token");
+    //     if(!isTokenValid(currentToken)){
+    //         logout();
+    //         return false;
+    //     }
+    //     return true;
+    // },[logout]);
+
+    // 페이지 이동 시 호출되는 토큰 유효성 검사 & Silent Refresh
+    const checkAuth = useCallback(async (): Promise<boolean> => {
         const currentToken = localStorage.getItem("token");
-        if(!isTokenValid(currentToken)){
+        if (isTokenValid(currentToken)) {
+            return true;
+        }
+        // Access Token이 만료되었을 때 Refresh Token으로 자동 연장 시도
+
+        //중복 호출 방지
+        if (ongoingRefreshPromise) {
+            return ongoingRefreshPromise;
+        }
+
+        const currentRefreshToken = localStorage.getItem("refreshToken");
+        if (!currentRefreshToken) {
             logout();
             return false;
         }
-        return true;
-    },[logout]);
+        ongoingRefreshPromise = (async () => {
+            try {
+                const res = await fetch("http://localhost:8081/api/auth/refresh", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ refreshToken: currentRefreshToken }),
+                });
+                if (res.ok) {
+                    const data: { accessToken: string; refreshToken: string } = await res.json();
+                    setToken(data.accessToken);
+                    setRefreshToken(data.refreshToken);
+                    setIsLoggedIn(true);
+                    localStorage.setItem("token", data.accessToken);
+                    localStorage.setItem("refreshToken", data.refreshToken);
+                    return true;
+                }
+            } catch (e) {
+                console.error("자동 세션 연장 실패:", e);
+            } finally {
+                ongoingRefreshPromise = null;
+            }
+            logout();
+            return false;
+        })();
+        return ongoingRefreshPromise;
+    }, [logout]);
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, login, logout, user, name, token, checkAuth }}>
+        <AuthContext.Provider value={{ isLoggedIn, login, logout, user, name, token, refreshToken, checkAuth }}>
             {children}
         </AuthContext.Provider>
     );

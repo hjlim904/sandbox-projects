@@ -1,7 +1,9 @@
 package com.practice.auth.dto;
 
 public record LoginResponse(
-   String token,
+   String accessToken,
+   String refreshToken,
    String username,
-   String name
+   String name,
+   String role
 ) {}

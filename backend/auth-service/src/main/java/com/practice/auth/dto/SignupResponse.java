@@ -1,8 +1,8 @@
 package com.practice.auth.dto;
 
-public record SignUpRequest (
+public record SignupResponse(
+    Long id,
     String username,
-    String password,
     String name,
     String role
-){}
+) {}

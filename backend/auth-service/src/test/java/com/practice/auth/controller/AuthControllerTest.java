@@ -36,11 +36,11 @@ public class AuthControllerTest {
     @DisplayName("로그인 성공 시 토큰 반환")
     void loginSuccess() throws Exception {
         LoginRequest request = new LoginRequest("admin", "1");
-        LoginResponse response = new LoginResponse("mocked_jwt_token", "admin", "관리자");
+        LoginResponse response = new LoginResponse("mocked_jwt_token", "mocked_jwt_refresh_token","admin", "관리자", "role");
         given(authService.login(any(LoginRequest.class))).willReturn(response);
 
         mockMvc.perform(post("/api/auth/login").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.token").value("mocked_jwt_token"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.accessToken").value("mocked_jwt_token"))
                 .andExpect(jsonPath("$.username").value("admin"))
                 .andExpect(jsonPath("$.name").value("관리자"));
     }

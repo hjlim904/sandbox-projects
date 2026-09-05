@@ -14,21 +14,37 @@ import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
-    private final SecretKey key;
-    private final long validityInMilliseconds;
+    private final SecretKey secretKey;
+    private final long accessTokenValidityInMilliseconds;
+    private final long refreshTokenValidityInMilliseconds;
     public JwtTokenProvider(
-            @Value("${jwt.secret:DijYByK6FnJST8EHfT9GE2Bk/jWpzZ3QjtY6rpZNxV4=}") String secretKey,
-            @Value("${jwt.expiration:3600000}") long validityInMilliseconds
+            @Value("${jwt.secret:DijYByK6FnJST8EHfT9GE2Bk/jWpzZ3QjtY6rpZNxV4=}") String secret,
+            @Value("${jwt.access-expiration:600000}") long accessTokenValidityInMilliseconds,
+            @Value("${jwt.refresh-expiration:3600000}") long refreshTokenValidityInMilliseconds
     )  {
-        this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
-        this.validityInMilliseconds = validityInMilliseconds;
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        this.accessTokenValidityInMilliseconds = accessTokenValidityInMilliseconds;
+        this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds;
     }
 
-    public String createToken(String userName, Role role) {
+    // Access Token 생성(role 포함)
+    public String createAccessToken(String userName, Role role) {
         Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMilliseconds);
+        Date validity = new Date(now.getTime() + accessTokenValidityInMilliseconds);
 
-        return Jwts.builder().subject(userName).claim("role", role.name()).issuedAt(now).expiration(validity).signWith(key).compact();
+        return Jwts.builder().subject(userName).claim("role", role.name()).issuedAt(now).expiration(validity).signWith(secretKey).compact();
+    }
+
+    // refresh Token 생성(role 포함)
+    public String createRefreshToken(String userName) {
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + refreshTokenValidityInMilliseconds);
+
+        return Jwts.builder().subject(userName).issuedAt(now).expiration(validity).signWith(secretKey).compact();
+    }
+
+    public long getRefreshTokenValidityInMilliseconds() {
+        return refreshTokenValidityInMilliseconds;
     }
 
     public String getUserName(String token) {
@@ -49,6 +65,6 @@ public class JwtTokenProvider {
     }
 
     private Claims parseClaims(String token) {
-        return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
     }
 }

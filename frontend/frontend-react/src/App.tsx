@@ -3,24 +3,35 @@ import { AuthProvider, useAuth } from "./components/context/AuthContext";
 import LoginPage from "./components/pages/LoginPage";
 import { MainLayout } from "./components/layout/MainLayout";
 import MainPage from "./components/pages/MainPage";
-import Practice3Page from "./components/pages/Practice3Page";
-import { useEffect } from "react";
-import Practice4Page from "./components/pages/Practice4Page";
-import Practice2Page from "./components/pages/Practice2Page";
+import { useEffect, useState } from "react";
 import Practice1Page from "./components/pages/Practice1Page";
+import Practice2Page from "./components/pages/Practice2Page";
+import Practice3Page from "./components/pages/Practice3Page";
+import Practice4Page from "./components/pages/Practice4Page";
 
 
 // 로그인하지 않은 사용자를 /login 으로 튕겨내는 보호용 컴포넌트 (Protected Route)
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isLoggedIn, checkAuth } = useAuth();
   const location = useLocation();
-
-  // useEffect(()=>{
-  //   checkAuth();
-  // },[location.pathname, checkAuth]);
-  const isValid = checkAuth();
-
-  if (!isLoggedIn || !isValid) {
+  const [checking, setChecking] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
+  useEffect(() => {
+    let isMounted = true;
+    checkAuth().then((valid) => {
+      if (isMounted) {
+        setAuthorized(valid);
+        setChecking(false);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [location.pathname, checkAuth]);
+  if (checking) {
+    return null; // 토큰 검증 중에는 깜빡임 방지
+  }
+  if (!isLoggedIn || !authorized) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   return <>{children}</>;
