@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/agent")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 public class AgentChatSseController {
 
     private final ChatAgentUseCase chatAgentUseCase;

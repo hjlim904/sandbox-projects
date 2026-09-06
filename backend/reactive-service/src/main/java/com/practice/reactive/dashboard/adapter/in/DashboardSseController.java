@@ -15,7 +15,7 @@ import java.time.Duration;
 @RestController
 @RequestMapping("/api/dashboard/stream")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*") // 프론트엔드 연동용
+//@CrossOrigin(origins = "*") // 프론트엔드 연동용
 public class DashboardSseController {
 
     private final GetDashboardMetricsUseCase getDashboardMetricsUseCase;

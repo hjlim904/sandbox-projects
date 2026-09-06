@@ -11,7 +11,7 @@ export interface ChatMessage {
   isThinking?: boolean;
 }
 
-const BASE_URL = "http://localhost:8082";
+const BASE_URL = "http://localhost:8080";
 
 export function useAgentChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([

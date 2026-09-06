@@ -55,7 +55,7 @@ export default function Practice1Page() {
   const fetchPosts = useCallback(async (targetPage: number = 0) => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8082/api/posts?page=${targetPage}&size=5`);
+      const res = await fetch(`http://localhost:8080/api/posts?page=${targetPage}&size=5`);
       if (res.ok) {
         const data: PageResponse<Post> = await res.json();
         setPosts(data.items);
@@ -78,7 +78,7 @@ export default function Practice1Page() {
   const openDetailModal = async (postId: number) => {
     setIsDetailLoading(true);
     try {
-      const res = await fetch(`http://localhost:8082/api/posts/${postId}`);
+      const res = await fetch(`http://localhost:8080/api/posts/${postId}`);
       if (res.ok) {
         const data: PostDetail = await res.json();
         setSelectedPostDetail(data);
@@ -102,8 +102,8 @@ export default function Practice1Page() {
     try {
       const isEdit = !!editingPost;
       const url = isEdit
-        ? `http://localhost:8082/api/posts/${editingPost.id}`
-        : "http://localhost:8082/api/posts";
+        ? `http://localhost:8080/api/posts/${editingPost.id}`
+        : "http://localhost:8080/api/posts";
       const method = isEdit ? "PUT" : "POST";
 
       const res = await fetch(url, {
@@ -143,7 +143,7 @@ export default function Practice1Page() {
     if (!window.confirm(t("practice1.detail.deleteConfirm"))) return;
 
     try {
-      const res = await fetch(`http://localhost:8082/api/posts/${postId}`, {
+      const res = await fetch(`http://localhost:8080/api/posts/${postId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -168,7 +168,7 @@ export default function Practice1Page() {
 
     try {
       const res = await fetch(
-        `http://localhost:8082/api/posts/${selectedPostDetail.post.id}/comments`,
+        `http://localhost:8080/api/posts/${selectedPostDetail.post.id}/comments`,
         {
           method: "POST",
           headers: {
@@ -199,7 +199,7 @@ export default function Practice1Page() {
 
     try {
       const res = await fetch(
-        `http://localhost:8082/api/posts/${selectedPostDetail.post.id}/comments/${commentId}`,
+        `http://localhost:8080/api/posts/${selectedPostDetail.post.id}/comments/${commentId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

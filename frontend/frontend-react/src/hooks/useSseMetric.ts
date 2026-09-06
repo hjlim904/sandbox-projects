@@ -20,7 +20,7 @@ export interface ThreadDataPoint {
   daemonThreads: number;
 }
 
-const BASE_URL = "http://localhost:8082";
+const BASE_URL = "http://localhost:8080";
 
 export function useSseMetric<T>(endpoint: string, enabled: boolean) {
   const [dataHistory, setDataHistory] = useState<T[]>([]);

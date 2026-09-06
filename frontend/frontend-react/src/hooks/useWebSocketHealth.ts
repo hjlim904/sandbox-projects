@@ -14,7 +14,7 @@ export interface LogMessage {
   type: "info" | "success" | "error" | "ping";
 }
 
-const WS_URL = "ws://localhost:8082/ws/dashboard/health";
+const WS_URL = "ws://localhost:8080/ws/dashboard/health";
 
 export function useWebSocketHealth(enabled: boolean) {
   const [components, setComponents] = useState<Record<string, HealthMetric>>({});

@@ -27,7 +27,7 @@ export default function Practice2Page() {
         headers["Authorization"] = `Bearer ${token}`;
       }
 
-      const res = await fetch(`http://localhost:8082${endpoint}`, {
+      const res = await fetch(`http://localhost:8080${endpoint}`, {
         method: "GET",
         headers,
       });
