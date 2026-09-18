@@ -1,3 +1,4 @@
+import { WS_BASE_URL } from "@/config/env";
 import { useEffect, useRef, useState, useCallback } from "react";
 
 export interface HealthMetric {
@@ -14,7 +15,7 @@ export interface LogMessage {
   type: "info" | "success" | "error" | "ping";
 }
 
-const WS_URL = "ws://localhost:8080/ws/dashboard/health";
+const WS_URL = `${WS_BASE_URL}/ws/dashboard/health`;
 
 export function useWebSocketHealth(enabled: boolean) {
   const [components, setComponents] = useState<Record<string, HealthMetric>>({});

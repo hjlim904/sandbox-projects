@@ -1,0 +1,63 @@
+services:
+  discovery-service:
+    build:
+      context: ./backend/discovery-service
+    container_name: discovery-service
+    ports:
+      - "18761:8761"
+    networks:
+      - sandbox-net
+
+  auth-service:
+    build:
+      context: ./backend/auth-service
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      - EUREKA_SERVER_URL=http://discovery-service:8761/eureka/
+    depends_on:
+      - discovery-service
+    networks:
+      - sandbox-net
+
+  reactive-service:
+    build:
+      context: ./backend/reactive-service
+    container_name: reactive-service
+    ports:
+      - "8082:8082"
+    environment:
+      - EUREKA_SERVER_URL=http://discovery-service:8761/eureka/
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    depends_on:
+      - discovery-service
+    networks:
+      - sandbox-net
+
+  gateway-service:
+    build:
+      context: ./backend/gateway-service
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    environment:
+      - EUREKA_SERVER_URL=http://discovery-service:8761/eureka/
+      - CORS_ALLOWED_ORIGIN=http://localhost:3000
+    depends_on:
+      - discovery-service
+    networks:
+      - sandbox-net
+
+  frontend:
+    build:
+      context: ./frontend/frontend-react
+    container_name: frontend-react
+    ports:
+      - "3000:80"
+    networks:
+      - sandbox-net
+
+networks:
+  sandbox-net:
+    driver: bridge

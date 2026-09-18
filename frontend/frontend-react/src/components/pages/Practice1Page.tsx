@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import {FileText, Plus, MessageSquare, Trash2, Edit3, Calendar, User, ChevronLeft, ChevronRight, Send, X, RefreshCw, Clock} from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { API_BASE_URL } from "@/config/env";
 
 interface Post {
   id: number;
@@ -33,6 +34,8 @@ interface PageResponse<T> {
   totalPages: number;
 }
 
+const BASE_URL = API_BASE_URL;
+
 export default function Practice1Page() {
   const { t } = useTranslation();
   const { user, token } = useAuth();
@@ -45,7 +48,7 @@ export default function Practice1Page() {
   const [isWriteModalOpen, setIsWriteModalOpen] = useState<boolean>(false);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [selectedPostDetail, setSelectedPostDetail] = useState<PostDetail | null>(null);
-  const [isDetailLoading, setIsDetailLoading] = useState<boolean>(false);
+  //const [isDetailLoading, setIsDetailLoading] = useState<boolean>(false);
 
   const [formTitle, setFormTitle] = useState("");
   const [formContent, setFormContent] = useState("");
@@ -55,7 +58,7 @@ export default function Practice1Page() {
   const fetchPosts = useCallback(async (targetPage: number = 0) => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8080/api/posts?page=${targetPage}&size=5`);
+      const res = await fetch(`${BASE_URL}/api/posts?page=${targetPage}&size=5`);
       if (res.ok) {
         const data: PageResponse<Post> = await res.json();
         setPosts(data.items);
@@ -76,9 +79,9 @@ export default function Practice1Page() {
 
   // 게시글 조회 (댓글)
   const openDetailModal = async (postId: number) => {
-    setIsDetailLoading(true);
+    //setIsDetailLoading(true);
     try {
-      const res = await fetch(`http://localhost:8080/api/posts/${postId}`);
+      const res = await fetch(`${BASE_URL}/api/posts/${postId}`);
       if (res.ok) {
         const data: PostDetail = await res.json();
         setSelectedPostDetail(data);
@@ -86,7 +89,7 @@ export default function Practice1Page() {
     } catch (err) {
       console.error(err);
     } finally {
-      setIsDetailLoading(false);
+      //setIsDetailLoading(false);
     }
   };
 
@@ -102,8 +105,8 @@ export default function Practice1Page() {
     try {
       const isEdit = !!editingPost;
       const url = isEdit
-        ? `http://localhost:8080/api/posts/${editingPost.id}`
-        : "http://localhost:8080/api/posts";
+        ? `${BASE_URL}/api/posts/${editingPost.id}`
+        : `${BASE_URL}/api/posts`;
       const method = isEdit ? "PUT" : "POST";
 
       const res = await fetch(url, {
@@ -143,7 +146,7 @@ export default function Practice1Page() {
     if (!window.confirm(t("practice1.detail.deleteConfirm"))) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/api/posts/${postId}`, {
+      const res = await fetch(`${BASE_URL}/api/posts/${postId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -162,13 +165,13 @@ export default function Practice1Page() {
   };
 
   // 댓글 작성
-  const handleAddComment = async (e: React.FormEvent) => {
+  const handleAddComment = async (e: React.SubmitEvent) => {
     e.preventDefault();
     if (!commentInput.trim() || !selectedPostDetail || !token) return;
 
     try {
       const res = await fetch(
-        `http://localhost:8080/api/posts/${selectedPostDetail.post.id}/comments`,
+        `${BASE_URL}/api/posts/${selectedPostDetail.post.id}/comments`,
         {
           method: "POST",
           headers: {
@@ -199,7 +202,7 @@ export default function Practice1Page() {
 
     try {
       const res = await fetch(
-        `http://localhost:8080/api/posts/${selectedPostDetail.post.id}/comments/${commentId}`,
+        `${BASE_URL}/api/posts/${selectedPostDetail.post.id}/comments/${commentId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

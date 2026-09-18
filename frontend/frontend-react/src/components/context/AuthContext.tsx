@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/config/env";
 import { jwtDecode } from "jwt-decode";
 import React, { createContext, useCallback, useContext, useState } from "react";
 
@@ -28,6 +29,7 @@ const isTokenValid = (token: string | null): boolean => {
   }
 };
 
+const BASE_URL = API_BASE_URL;
 let ongoingRefreshPromise: Promise<boolean> | null = null;
 
 //export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -91,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },[]);
 
     const login = async (username: string, password: string) => {
-        const response = await fetch("http://localhost:8080/api/auth/login", {
+        const response = await fetch(`${BASE_URL}/api/auth/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -162,7 +164,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         ongoingRefreshPromise = (async () => {
             try {
-                const res = await fetch("http://localhost:8080/api/auth/refresh", {
+                const res = await fetch(`${BASE_URL}/api/auth/refresh`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ refreshToken: currentRefreshToken }),

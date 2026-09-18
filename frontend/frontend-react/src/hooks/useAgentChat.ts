@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/config/env";
 import { useState, useCallback } from "react";
 
 export interface ChatMessage {
@@ -11,7 +12,7 @@ export interface ChatMessage {
   isThinking?: boolean;
 }
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = API_BASE_URL;
 
 export function useAgentChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([

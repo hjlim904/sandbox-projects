@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Shield, ShieldAlert, ShieldCheck, Globe, User, Terminal, RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { API_BASE_URL } from "@/config/env";
 
 interface ApiResponse {
   endpoint: string;
@@ -10,6 +11,8 @@ interface ApiResponse {
   data: any;
   timestamp: string;
 }
+
+const BASE_URL = API_BASE_URL;
 
 export default function Practice2Page() {
   const { t } = useTranslation();
@@ -27,7 +30,7 @@ export default function Practice2Page() {
         headers["Authorization"] = `Bearer ${token}`;
       }
 
-      const res = await fetch(`http://localhost:8080${endpoint}`, {
+      const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: "GET",
         headers,
       });

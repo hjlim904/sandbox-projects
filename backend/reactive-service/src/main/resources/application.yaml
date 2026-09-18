@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: ${SERVER_PORT:8082}
 
 spring:
   application:
@@ -17,7 +17,7 @@ spring:
       api-key: dummy-key-for-bootstrap
 
 jwt:
-  secret: DijYByK6FnJST8EHfT9GE2Bk/jWpzZ3QjtY6rpZNxV4= #연습이니 그냥 적음 원래는 노출되면 안됨
+  secret: ${JWT_SECRET:DijYByK6FnJST8EHfT9GE2Bk/jWpzZ3QjtY6rpZNxV4=} #연습이니 그냥 적음 원래는 노출되면 안됨
 
 gemini:
   api-key: ${GEMINI_API_KEY:YOUR_GEMINI_API_KEY_HERE} # 환경변수 또는 직접 입력
@@ -27,7 +27,7 @@ gemini:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
   instance:
     instance-id: ${spring.application.name}:${random.value}
     prefer-ip-address: true

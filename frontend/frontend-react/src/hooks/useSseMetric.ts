@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/config/env";
 import { useEffect, useState } from "react";
 
 export interface CpuDataPoint {
@@ -20,7 +21,7 @@ export interface ThreadDataPoint {
   daemonThreads: number;
 }
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = API_BASE_URL;
 
 export function useSseMetric<T>(endpoint: string, enabled: boolean) {
   const [dataHistory, setDataHistory] = useState<T[]>([]);

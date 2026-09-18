@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "@/config/env";
+
 export async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<Response> {
   const token = localStorage.getItem("token");
   const headers = new Headers(options.headers || {});
@@ -13,7 +15,7 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}): Pro
     const refreshToken = localStorage.getItem("refreshToken");
     if (refreshToken) {
       try {
-        const refreshRes = await fetch("http://localhost:8080/api/auth/refresh", {
+        const refreshRes = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ refreshToken }),
