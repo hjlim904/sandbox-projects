@@ -1,12 +1,12 @@
 services:
-  discovery-service:
-    build:
-      context: ./backend/discovery-service
-    container_name: discovery-service
-    ports:
-      - "18761:8761"
-    networks:
-      - sandbox-net
+  # discovery-service:
+  #   build:
+  #     context: ./backend/discovery-service
+  #   container_name: discovery-service
+  #   ports:
+  #     - "18761:8761"
+  #   networks:
+  #     - sandbox-net
 
   auth-service:
     build:
@@ -15,9 +15,11 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - EUREKA_SERVER_URL=http://discovery-service:8761/eureka/
-    depends_on:
-      - discovery-service
+      # - EUREKA_SERVER_URL=http://discovery-service:8761/eureka/
+      - EUREKA_CLIENT_ENABLED=false
+      - JWT_SECRET=DijYByK6FnJST8EHfT9GE2Bk/jWpzZ3QjtY6rpZNxV4=
+    # depends_on:
+    #   - discovery-service
     networks:
       - sandbox-net
 
@@ -28,26 +30,28 @@ services:
     ports:
       - "8082:8082"
     environment:
-      - EUREKA_SERVER_URL=http://discovery-service:8761/eureka/
+      # - EUREKA_SERVER_URL=http://discovery-service:8761/eureka/
+      - EUREKA_CLIENT_ENABLED=false
+      - JWT_SECRET=DijYByK6FnJST8EHfT9GE2Bk/jWpzZ3QjtY6rpZNxV4=
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
-    depends_on:
-      - discovery-service
+    # depends_on:
+    #   - discovery-service
     networks:
       - sandbox-net
 
-  gateway-service:
-    build:
-      context: ./backend/gateway-service
-    container_name: gateway-service
-    ports:
-      - "8080:8080"
-    environment:
-      - EUREKA_SERVER_URL=http://discovery-service:8761/eureka/
-      - CORS_ALLOWED_ORIGIN=http://localhost:3000
-    depends_on:
-      - discovery-service
-    networks:
-      - sandbox-net
+  # gateway-service:
+  #   build:
+  #     context: ./backend/gateway-service
+  #   container_name: gateway-service
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     - EUREKA_SERVER_URL=http://discovery-service:8761/eureka/
+  #     - CORS_ALLOWED_ORIGIN=http://localhost:3000
+  #   depends_on:
+  #     - discovery-service
+  #   networks:
+  #     - sandbox-net
 
   frontend:
     build:

@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reactive-service
+  namespace: sandbox
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reactive-service
+  template:
+    metadata:
+      labels:
+        app: reactive-service
+    spec:
+      containers:
+        - name: reactive-service
+          image: reactive-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8082
+          env:
+            - name: EUREKA_CLIENT_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: EUREKA_CLIENT_ENABLED
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: JWT_SECRET
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: GEMINI_API_KEY
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reactive-service
+  namespace: sandbox
+spec:
+  type: ClusterIP
+  selector:
+    app: reactive-service
+  ports:
+    - port: 8082
+      targetPort: 8082

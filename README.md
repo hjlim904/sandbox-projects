@@ -100,6 +100,8 @@ sandbox-projects/
 | **추가 2** | 프론트엔드 다국어(i18n) KR/EN 토글 | - | ✅ 완료 | 🟢 완료 |
 | **추가 3** | Service Discovery & Scale-out (Eureka) | ✅ 완료 | - | 🟢 완료 |
 | **추가 4** | API Gateway 단일 진입점 (Spring Cloud Gateway) | ✅ 완료 | ✅ 완료 | 🟢 완료 |
+| **추가 5** | Dockerfile 빌드 & Docker Compose | ✅ 완료 | ✅ 완료 | 🟢 완료 |
+| **추가 6** | Kubernetes 배포 (ConfigMap, Secret, Deployment, Service, Scale-out) | ✅ 완료 | ✅ 완료 | 🟢 완료 |
 
 ---
 
@@ -211,3 +213,91 @@ npm run dev
   * `GET /api/dashboard/stream/threads` (활성 스레드 수)
 * **WebSocket 실시간 헬스**: `ws://localhost:8082/ws/dashboard/health`
 * **AI Ops Agent 스트림**: `POST /api/agent/chat/stream`
+
+---
+
+## 🐳 도커 & 쿠버네티스(K8s) 배포 가이드
+
+**Spring Cloud MSA(Eureka + Gateway)** 구조에서 **클라우드 네이티브(Kubernetes-Native)** 구조로 전환하여 컨테이너화 및 오케스트레이션을 지원합니다.
+
+```text
+[사용자 브라우저]
+       │ (http://localhost:30000 또는 port-forward 3000)
+       ▼
+[frontend-service (Nginx Pod)]
+       ├── "/"               ➔ 프론트엔드 React SPA 정적 서빙
+       ├── "/api/auth/*"     ➔ K8s 내부 DNS (http://auth-service:8081) 로 프록시
+       ├── "/api/*"          ➔ K8s 내부 DNS (http://reactive-service:8082) 로 프록시
+       └── "/ws/*"           ➔ K8s 내부 DNS (http://reactive-service:8082) 로 WebSocket 프록시
+```
+
+> **기존과 차이**:
+> 1. **Eureka 제거**: K8s의 내장 Service & CoreDNS가 서비스 디스커버리와 부하 분산을 전담 (`EUREKA_CLIENT_ENABLED=false`).
+> 2. **Spring Cloud Gateway 대체**: 프론트엔드 Nginx의 Reverse Proxy가 단일 진입점 역할을 하여 불필요한 게이트웨이 JVM 리소스 절약 및 CORS 이슈 해결.
+
+---
+
+### 1. Dockerfile 멀티스테이지 빌드
+* **백엔드 (`eclipse-temurin:21-jdk-alpine` ➔ `eclipse-temurin:21-jre-alpine`)**: 빌드 도구와 런타임을 분리하여 보안 강화 및 이미지 경량화.
+* **프론트엔드 (`node:20-alpine` ➔ `nginx:alpine`)**: 정적 번들 빌드 후 Nginx 웹서버로 서빙 및 API 프록시 처리.
+
+---
+
+### 2. Docker Compose로 로컬 실행
+
+```bash
+# 전체 빌드 및 백그라운드 기동
+docker compose up -d --build
+
+# 인스턴스 스케일 아웃 테스트 (Docker 내장 DNS 라운드로빈 검증)
+docker compose up --scale reactive-service=3 -d
+
+# 실행 상태 확인
+docker compose ps
+
+# 브라우저 접속: http://localhost:3000
+```
+
+---
+
+### 3. Kubernetes (K8s) 배포 및 실습
+
+#### 1) 도커 이미지 빌드 및 로컬 태깅
+```bash
+docker tag sandbox-projects-auth-service:latest auth-service:latest
+docker tag sandbox-projects-reactive-service:latest reactive-service:latest
+docker tag sandbox-projects-frontend:latest frontend-react:latest
+```
+
+#### 2) K8s 리소스 전체 배포
+```bash
+# 네임스페이스, ConfigMap, Secret, Deployment, Service 일괄 적용
+kubectl apply -f k8s/
+```
+
+#### 3) 배포 상태 확인
+```bash
+# Pod, Service, Deployment 상태 확인
+kubectl get all -n sandbox
+```
+
+#### 4) 로컬 접속 (Port-Forward)
+```bash
+kubectl port-forward -n sandbox svc/frontend 3000:80
+# 브라우저 접속: http://localhost:3000
+```
+
+#### 5) K8s 스케일 아웃(Scale-Out) 실습
+```bash
+# reactive-service를 3개 Pod로 증설
+kubectl scale deployment reactive-service -n sandbox --replicas=3
+
+# 분산된 Pod IP 및 엔드포인트 확인
+kubectl get pods -n sandbox -l app=reactive-service -o wide
+kubectl get endpoints reactive-service -n sandbox
+```
+
+#### 6) K8s 리소스 정리
+```bash
+kubectl delete -f k8s/
+```
