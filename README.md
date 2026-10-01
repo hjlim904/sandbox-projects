@@ -101,7 +101,7 @@ sandbox-projects/
 | **추가 3** | Service Discovery & Scale-out (Eureka) | ✅ 완료 | - | 🟢 완료 |
 | **추가 4** | API Gateway 단일 진입점 (Spring Cloud Gateway) | ✅ 완료 | ✅ 완료 | 🟢 완료 |
 | **추가 5** | Dockerfile 빌드 & Docker Compose | ✅ 완료 | ✅ 완료 | 🟢 완료 |
-| **추가 6** | Kubernetes 배포 (ConfigMap, Secret, Deployment, Service, Scale-out) | ✅ 완료 | ✅ 완료 | 🟢 완료 |
+| **추가 6** | Kubernetes 배포 (ConfigMap, Secret, Deployment, Service, Ingress, Scale-out) | ✅ 완료 | ✅ 완료 | 🟢 완료 |
 
 ---
 
@@ -218,28 +218,29 @@ npm run dev
 
 ## 🐳 도커 & 쿠버네티스(K8s) 배포 가이드
 
-**Spring Cloud MSA(Eureka + Gateway)** 구조에서 **클라우드 네이티브(Kubernetes-Native)** 구조로 전환하여 컨테이너화 및 오케스트레이션을 지원합니다.
+**Spring Cloud MSA(Eureka + Gateway)** 구조에서 **클라우드 네이티브(Kubernetes-Native with Ingress)** 구조로 전환하여 컨테이너화 및 L7 인프라 오케스트레이션을 지원합니다.
 
 ```text
 [사용자 브라우저]
-       │ (http://localhost:30000 또는 port-forward 3000)
+       │ (http://localhost:8080 또는 Ingress Controller IP)
        ▼
-[frontend-service (Nginx Pod)]
-       ├── "/"               ➔ 프론트엔드 React SPA 정적 서빙
-       ├── "/api/auth/*"     ➔ K8s 내부 DNS (http://auth-service:8081) 로 프록시
-       ├── "/api/*"          ➔ K8s 내부 DNS (http://reactive-service:8082) 로 프록시
-       └── "/ws/*"           ➔ K8s 내부 DNS (http://reactive-service:8082) 로 WebSocket 프록시
+[Kubernetes Ingress (ingress-nginx-controller)]
+       ├── "/"               ➔ frontend Service (ClusterIP:80) ➔ React SPA 정적 서빙
+       ├── "/api/auth/*"     ➔ auth-service Service (ClusterIP:8081)
+       ├── "/api/*"          ➔ reactive-service Service (ClusterIP:8082)
+       └── "/ws/*"           ➔ reactive-service Service (ClusterIP:8082) WebSocket
 ```
 
-> **기존과 차이**:
+> **클라우드 네이티브 아키텍처 전환 포인트**:
 > 1. **Eureka 제거**: K8s의 내장 Service & CoreDNS가 서비스 디스커버리와 부하 분산을 전담 (`EUREKA_CLIENT_ENABLED=false`).
-> 2. **Spring Cloud Gateway 대체**: 프론트엔드 Nginx의 Reverse Proxy가 단일 진입점 역할을 하여 불필요한 게이트웨이 JVM 리소스 절약 및 CORS 이슈 해결.
+> 2. **Ingress Controller(L7 Gateway) 도입**: `Spring Cloud Gateway` 대신 Kubernetes 표준 `Ingress Controller`가 단일 진입점 역할을 전담하여 인프라 계층(라우팅/SSL/CORS)과 애플리케이션 계층을 완전히 분리하고 JVM 리소스를 절약합니다.
+> 3. **Frontend Nginx 경량화**: 프론트엔드 Nginx는 API 프록시 책임 없이 순수한 React SPA 정적 파일 서빙만 담당합니다.
 
 ---
 
 ### 1. Dockerfile 멀티스테이지 빌드
 * **백엔드 (`eclipse-temurin:21-jdk-alpine` ➔ `eclipse-temurin:21-jre-alpine`)**: 빌드 도구와 런타임을 분리하여 보안 강화 및 이미지 경량화.
-* **프론트엔드 (`node:20-alpine` ➔ `nginx:alpine`)**: 정적 번들 빌드 후 Nginx 웹서버로 서빙 및 API 프록시 처리.
+* **프론트엔드 (`node:20-alpine` ➔ `nginx:alpine`)**: 정적 번들 빌드 후 Nginx 웹서버로 순수 SPA 서빙 전담.
 
 ---
 
@@ -262,32 +263,54 @@ docker compose ps
 
 ### 3. Kubernetes (K8s) 배포 및 실습
 
-#### 1) 도커 이미지 빌드 및 로컬 태깅
+#### 1) 사전 준비: Ingress Controller 활성화
+Kubernetes 표준 Ingress 리소스를 처리하려면 클러스터에 Ingress Controller가 실행 중이어야 합니다.
+
+* **Docker Desktop / Kind / Bare-metal**:
+  ```bash
+  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.0/deploy/static/provider/cloud/deploy.yaml
+  ```
+* **Minikube**:
+  ```bash
+  minikube addons enable ingress
+  ```
+
+#### 2) 도커 이미지 빌드 및 로컬 태깅
 ```bash
 docker tag sandbox-projects-auth-service:latest auth-service:latest
 docker tag sandbox-projects-reactive-service:latest reactive-service:latest
 docker tag sandbox-projects-frontend:latest frontend-react:latest
 ```
 
-#### 2) K8s 리소스 전체 배포
+#### 3) K8s 리소스 전체 배포
 ```bash
-# 네임스페이스, ConfigMap, Secret, Deployment, Service 일괄 적용
+# Namespace, ConfigMap, Secret, Deployment, Service, Ingress 일괄 배포
 kubectl apply -f k8s/
 ```
 
-#### 3) 배포 상태 확인
+#### 4) 배포 상태 확인
 ```bash
 # Pod, Service, Deployment 상태 확인
 kubectl get all -n sandbox
+
+# Ingress 주소 및 바인딩 상태 확인
+kubectl get ingress -n sandbox
 ```
 
-#### 4) 로컬 접속 (Port-Forward)
+#### 5) 로컬 접속 (Ingress Controller 경유)
+Ingress Controller를 통해 전체 서비스(프론트엔드 + 백엔드 API + WebSocket)에 접근합니다:
+
 ```bash
-kubectl port-forward -n sandbox svc/frontend 3000:80
-# 브라우저 접속: http://localhost:3000
+# Ingress Controller 서비스 포트포워딩 (8080 -> 80)
+kubectl port-forward -n ingress-nginx svc/ingress-nginx-controller 8080:80
 ```
 
-#### 5) K8s 스케일 아웃(Scale-Out) 실습
+* **브라우저 접속**: `http://localhost:8080`
+  * `/` ➔ Frontend React SPA
+  * `/api/auth/*` ➔ Auth Service
+  * `/api/*`, `/ws/*` ➔ Reactive Service
+
+#### 6) K8s 스케일 아웃(Scale-Out) 실습
 ```bash
 # reactive-service를 3개 Pod로 증설
 kubectl scale deployment reactive-service -n sandbox --replicas=3
@@ -297,7 +320,7 @@ kubectl get pods -n sandbox -l app=reactive-service -o wide
 kubectl get endpoints reactive-service -n sandbox
 ```
 
-#### 6) K8s 리소스 정리
+#### 7) K8s 리소스 정리
 ```bash
 kubectl delete -f k8s/
 ```

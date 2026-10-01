@@ -1,0 +1,49 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sandbox-ingress
+  namespace: sandbox
+  annotations:
+    # NGINX Ingress Controller 기준 설정
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+spec:
+  rules:
+    - http:
+        paths:
+          # 1. 인증 서비스 라우팅
+          - path: /api/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8081
+
+          # 2. WebSocket 라우팅
+          - path: /ws
+            pathType: Prefix
+            backend:
+              service:
+                name: reactive-service
+                port:
+                  number: 8082
+
+          # 3. 비즈니스 API 라우팅
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: reactive-service
+                port:
+                  number: 8082
+
+          # 4. 프론트엔드 SPA 정적 파일 (기본 경로)
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
